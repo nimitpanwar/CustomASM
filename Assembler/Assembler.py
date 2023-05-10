@@ -46,6 +46,20 @@ def encode_type_B(opcode, operands):
     encoded = opcodes[opcode] + '0' + registers[reg] + format(imm, '07b')
     return encoded
 
+def encode_type_C(opcode, operands):
+reg1, reg2 = operands.split()
+encoded = opcodes[opcode] + '00000' + registers[reg1] + registers[reg2]
+return encoded
+
+def encode_type_D(opcode, operands):
+reg1, mem_addr = operands.split()
+encoded = opcodes[opcode] + registers[reg1] + format(mem_addr, '07b')
+return encoded
+
+def encode_type_E(opcode, operands):
+mem_addr = operands
+endcoded = opcodes[opcode] + '0000' + format(mem_addr, '07b')
+return encoded
 
 while True:
     line = input().strip()
@@ -68,3 +82,20 @@ while True:
         reg1, reg2 = operands.split()
         encoded = '00011' + '00000' + registers[reg1] + registers[reg2]
         print(encoded)
+    
+    elif opcode in type_C and opcode != 'mov':
+    encoded = encode_type_C(opcode, operands)
+    print(encoded)
+    
+    elif opcode in type_D:
+    encoded = encode_type_D(opcode, operands)
+    print(encoded)
+
+    elif opcode in type_E:
+    encoded = encode_type_D(opcode, operands)
+    print(encoded)
+
+    elif opcode in type_E:
+    encoded = opcodes[opcode] + '00000000000'
+    print(encoded)
+        
