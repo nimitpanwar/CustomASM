@@ -153,7 +153,7 @@ def typeB(instruction, reg, imm_val, ixx):
     if (op=='00010' or op=='01000' or op=='01001'):
         int_imm_val = int(imm_val)
         bin_imm_val = deccccn(int_imm_val)
-        print (op + c1  + format_zero_adder(bin_imm_val,8))
+        print (op + '0' + c1  + format_zero_adder(bin_imm_val,7))
         return
 
     else:
@@ -182,13 +182,13 @@ def typeD(instruction, r1, variable_name):
     c1 = register_dict[r1.upper()]
     mem_addr = variable_dict[variable_name]
     
-    print (op + c1  + mem_addr)
+    print (op + '0' + c1  + mem_addr)
  
     
 def typeE(instruction, mem_addr):
     #memory address type
     label_instruction_num = label_dict[mem_addr]
-    print (op_dict[instruction] + '0'*3  + format_zero_adder(deccccn(label_instruction_num),8))
+    print (op_dict[instruction] + '0'*4  + format_zero_adder(deccccn(label_instruction_num),7))
     # for i in inp:
     #     if (i<label_instruction_num):
     #         pass
@@ -231,7 +231,7 @@ def instruction_initialize(input,ixx):
         pass
 
 def var_define(input, var_counter):
-    variable_dict[input[1]] = format_zero_adder(deccccn(var_counter),8)
+    variable_dict[input[1]] = format_zero_adder(deccccn(var_counter),7)
     return
 
 def identify_input(input,ixx):
