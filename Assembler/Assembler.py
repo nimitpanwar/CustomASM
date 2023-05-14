@@ -285,6 +285,8 @@ def lbl_error(label_list):
 def typo_error(instructions):
     for i in instructions:
         if instructions[i][0] not in type_total:
+            with open("output","w")as f:
+                f.write("")
             print(f'Error at instruction line {i+var_count_final }')    
             print(f"Error: Instruction {instructions[i][0]} is not a valid instruction")
             exit()
@@ -496,6 +498,9 @@ for i in inp:
             var_list.append(inp[i][1])
             var_count += 1
 
+    elif inp[i] == []:
+        pass
+
     elif inp[i][0] in type_total:
         instructions[inst_count] = inp[i]
         inst_count += 1
@@ -505,9 +510,10 @@ for i in inp:
         label_dict[inp[i][0][:-1]] = i - var_count
         lbl_count += 1
         label_list.append(inp[i][0])
-
-    elif inp[i] == []:
-        pass
+        
+    elif inp[i][0] not in type_total and ":" not in inp[i][0]:
+        instructions[inst_count] = inp[i]
+        inst_count += 1
     else:
         var_count_final = var_count
         register_valid_check(instructions, var_list, label_list)
