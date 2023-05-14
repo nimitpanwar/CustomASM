@@ -524,6 +524,9 @@ for i in inp:
     ixx = i
     identify_input(inp[i],ixx)
 
+with open("output","w")as f:
+    f.write("")
+
 with open("output","a")as f:
     for i in range(len(output_list)):
         f.write(output_list[i])
