@@ -287,7 +287,6 @@ def typo_error(instructions):
         if instructions[i][0] not in type_total:
             with open("output","w")as f:
                 f.write("")
-            print("yes")
             print(f'Error at instruction line {i+var_count_final }')    
             print(f"Error: Instruction {instructions[i][0]} is not a valid instruction")
             exit()
