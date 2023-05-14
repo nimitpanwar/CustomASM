@@ -39,6 +39,7 @@ variable_dict = {}
 global label_dict 
 label_dict = {}
 var_temp_list = [0]
+lst = []
 
 typeA_list = ["add","sub","mul","xor","or","and","addf","subf"]
 typeB_list = ["rs","ls","movf"]
@@ -130,8 +131,9 @@ def typeA(instruction,r1,r2,r3):
     c3 = register_dict[r3.upper()]
 
     op = op_dict[instruction]
-    with open('/Users/nimitpanwar/Desktop/stuff/CS/VS-uni/SEM2/CO-Project-CustomASM/text.txt', 'a') as f:
-        print(op + '0'*2 + c1 + c2 + c3, file=f)
+    # print (op + '0'*2 + c1 + c2 + c3)
+    output_list.append(op + '0'*2 + c1 + c2 + c3)
+    
 
 
 def typeB(instruction, reg, imm_val, ixx):
@@ -144,14 +146,14 @@ def typeB(instruction, reg, imm_val, ixx):
     if (op=='00010' or op=='01000' or op=='01001'):
         int_imm_val = int(imm_val)
         bin_imm_val = deccccn(int_imm_val)
-        with open('/Users/nimitpanwar/Desktop/stuff/CS/VS-uni/SEM2/CO-Project-CustomASM/text.txt', 'a') as f:
-            print(op + '0' + c1  + format_zero_adder(bin_imm_val,7), file=f)
-            return
+        # print (op + '0' + c1  + format_zero_adder(bin_imm_val,7))
+        output_list.append(op + '0' + c1  + format_zero_adder(bin_imm_val,7))
+        return
 
     else:
         final_ieee_format = ieee_conv(imm_val,ixx)
-        with open('/Users/nimitpanwar/Desktop/stuff/CS/VS-uni/SEM2/CO-Project-CustomASM/text.txt', 'a') as f:
-            print(op+c1+final_ieee_format, file=f)
+        # print(op+c1+final_ieee_format)
+        output_list.append(op+c1+final_ieee_format)
 
 
 def typeC(instruction,r1,r2):
@@ -165,8 +167,8 @@ def typeC(instruction,r1,r2):
     c1 = register_dict[r1.upper()]
     c2 = register_dict[r2.upper()]
 
-    with open('/Users/nimitpanwar/Desktop/stuff/CS/VS-uni/SEM2/CO-Project-CustomASM/text.txt', 'a') as f:
-        print(op  + '0' * 5 + c1  + c2, file=f)
+    # print (op  + '0' * 5 + c1  + c2)
+    output_list.append(op  + '0' * 5 + c1  + c2)
 
 
 def typeD(instruction, r1, variable_name):
@@ -176,15 +178,15 @@ def typeD(instruction, r1, variable_name):
     c1 = register_dict[r1.upper()]
     mem_addr = variable_dict[variable_name]
     
-    with open('/Users/nimitpanwar/Desktop/stuff/CS/VS-uni/SEM2/CO-Project-CustomASM/text.txt', 'a') as f:
-        print(op + '0' + c1  + mem_addr, file=f)
+    # print (op + '0' + c1  + mem_addr)
+    output_list.append(op + '0' + c1  + mem_addr)
  
     
 def typeE(instruction, mem_addr):
     #memory address type
     label_instruction_num = label_dict[mem_addr]
-    with open('/Users/nimitpanwar/Desktop/stuff/CS/VS-uni/SEM2/CO-Project-CustomASM/text.txt', 'a') as f:
-        print(op_dict[instruction] + '0'*4  + format_zero_adder(deccccn(label_instruction_num),7), file=f)
+    # print (op_dict[instruction] + '0'*4  + format_zero_adder(deccccn(label_instruction_num),7))
+    output_list.append(op_dict[instruction] + '0'*4  + format_zero_adder(deccccn(label_instruction_num),7))
     # for i in inp:
     #     if (i<label_instruction_num):
     #         pass
@@ -193,8 +195,8 @@ def typeE(instruction, mem_addr):
 
 def typeF(instruction):
     #halt
-    with open('output.txt', 'a') as f:
-        print(op_dict[instruction] + '0'*11, file=f)
+    # print (op_dict[instruction] + '0'*11)
+    output_list.append(op_dict[instruction] + '0'*11)
 
 def instruction_initialize(input,ixx):
     if (input[0] in typeA_list):
@@ -469,8 +471,9 @@ var_list = [] #list containing all the input vars
 global var_count
 var_count = 0
 label_list=[] #list containing all the labels
+output_list=[] #list to append to the output file
 
-with open('/Users/nimitpanwar/Desktop/stuff/CS/VS-uni/SEM2/CO-Project-CustomASM/input.txt', 'r') as f:
+with open('sample.txt', 'r') as f:
     inp_lines = f.readlines()
     
 for line in inp_lines:
@@ -520,3 +523,11 @@ lbl_error(label_list)
 for i in inp:
     ixx = i
     identify_input(inp[i],ixx)
+
+with open("output","w")as f:
+    f.write("")
+
+with open("output","a")as f:
+    for i in range(len(output_list)):
+        f.write(output_list[i])
+        f.write("\n")
