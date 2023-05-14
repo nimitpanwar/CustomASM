@@ -39,7 +39,6 @@ variable_dict = {}
 global label_dict 
 label_dict = {}
 var_temp_list = [0]
-lst = []
 
 typeA_list = ["add","sub","mul","xor","or","and","addf","subf"]
 typeB_list = ["rs","ls","movf"]
@@ -131,9 +130,8 @@ def typeA(instruction,r1,r2,r3):
     c3 = register_dict[r3.upper()]
 
     op = op_dict[instruction]
-    # print (op + '0'*2 + c1 + c2 + c3)
-    output_list.append(op + '0'*2 + c1 + c2 + c3)
-    
+    with open('output.txt', 'a') as f:
+        print(op + '0'*2 + c1 + c2 + c3, file=f)
 
 
 def typeB(instruction, reg, imm_val, ixx):
@@ -146,14 +144,14 @@ def typeB(instruction, reg, imm_val, ixx):
     if (op=='00010' or op=='01000' or op=='01001'):
         int_imm_val = int(imm_val)
         bin_imm_val = deccccn(int_imm_val)
-        # print (op + '0' + c1  + format_zero_adder(bin_imm_val,7))
-        output_list.append(op + '0' + c1  + format_zero_adder(bin_imm_val,7))
-        return
+        with open('output.txt', 'a') as f:
+            print(op + '0' + c1  + format_zero_adder(bin_imm_val,7), file=f)
+            return
 
     else:
         final_ieee_format = ieee_conv(imm_val,ixx)
-        # print(op+c1+final_ieee_format)
-        output_list.append(op+c1+final_ieee_format)
+        with open('output.txt', 'a') as f:
+            print(op+c1+final_ieee_format, file=f)
 
 
 def typeC(instruction,r1,r2):
@@ -167,8 +165,8 @@ def typeC(instruction,r1,r2):
     c1 = register_dict[r1.upper()]
     c2 = register_dict[r2.upper()]
 
-    # print (op  + '0' * 5 + c1  + c2)
-    output_list.append(op  + '0' * 5 + c1  + c2)
+    with open('output.txt', 'a') as f:
+        print(op  + '0' * 5 + c1  + c2, file=f)
 
 
 def typeD(instruction, r1, variable_name):
@@ -178,15 +176,15 @@ def typeD(instruction, r1, variable_name):
     c1 = register_dict[r1.upper()]
     mem_addr = variable_dict[variable_name]
     
-    # print (op + '0' + c1  + mem_addr)
-    output_list.append(op + '0' + c1  + mem_addr)
+    with open('output.txt', 'a') as f:
+        print(op + '0' + c1  + mem_addr, file=f)
  
     
 def typeE(instruction, mem_addr):
     #memory address type
     label_instruction_num = label_dict[mem_addr]
-    # print (op_dict[instruction] + '0'*4  + format_zero_adder(deccccn(label_instruction_num),7))
-    output_list.append(op_dict[instruction] + '0'*4  + format_zero_adder(deccccn(label_instruction_num),7))
+    with open('output.txt', 'a') as f:
+        print(op_dict[instruction] + '0'*4  + format_zero_adder(deccccn(label_instruction_num),7), file=f)
     # for i in inp:
     #     if (i<label_instruction_num):
     #         pass
@@ -195,8 +193,8 @@ def typeE(instruction, mem_addr):
 
 def typeF(instruction):
     #halt
-    # print (op_dict[instruction] + '0'*11)
-    output_list.append(op_dict[instruction] + '0'*11)
+    with open('output.txt', 'a') as f:
+        print(op_dict[instruction] + '0'*11, file=f)
 
 def instruction_initialize(input,ixx):
     if (input[0] in typeA_list):
@@ -285,8 +283,6 @@ def lbl_error(label_list):
 def typo_error(instructions):
     for i in instructions:
         if instructions[i][0] not in type_total:
-            with open("output","w")as f:
-                f.write("")
             print(f'Error at instruction line {i+var_count_final }')    
             print(f"Error: Instruction {instructions[i][0]} is not a valid instruction")
             exit()
@@ -473,9 +469,8 @@ var_list = [] #list containing all the input vars
 global var_count
 var_count = 0
 label_list=[] #list containing all the labels
-output_list=[] #list to append to the output file
 
-with open('sample', 'r') as f:
+with open('input.txt', 'r') as f:
     inp_lines = f.readlines()
     
 for line in inp_lines:
@@ -498,9 +493,6 @@ for i in inp:
             var_list.append(inp[i][1])
             var_count += 1
 
-    elif inp[i] == []:
-        pass
-
     elif inp[i][0] in type_total:
         instructions[inst_count] = inp[i]
         inst_count += 1
@@ -510,10 +502,9 @@ for i in inp:
         label_dict[inp[i][0][:-1]] = i - var_count
         lbl_count += 1
         label_list.append(inp[i][0])
-        
-    elif inp[i][0] not in type_total and ":" not in inp[i][0]:
-        instructions[inst_count] = inp[i]
-        inst_count += 1
+
+    elif inp[i] == []:
+        pass
     else:
         var_count_final = var_count
         register_valid_check(instructions, var_list, label_list)
@@ -529,11 +520,3 @@ lbl_error(label_list)
 for i in inp:
     ixx = i
     identify_input(inp[i],ixx)
-
-with open("output","w")as f:
-    f.write("")
-
-with open("output","a")as f:
-    for i in range(len(output_list)):
-        f.write(output_list[i])
-        f.write("\n")
