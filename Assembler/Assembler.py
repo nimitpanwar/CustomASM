@@ -39,24 +39,16 @@ variable_dict = {}
 global label_dict 
 label_dict = {}
 var_temp_list = [0]
-
+lst = []
 
 typeA_list = ["add","sub","mul","xor","or","and","addf","subf"]
-
 typeB_list = ["rs","ls","movf"]
-
 typeC_list = ["cmp","not","div"]
-
 typeABC_list = typeA_list + typeB_list + typeC_list
-
 typeD_list = ["ld","st"]
-
 typeE_list = ["jmp","jlt","jgt","je"]
-
 typeF_list = ["hlt"]
-
 type_total = typeA_list + typeB_list + typeC_list + typeD_list + typeE_list + typeF_list + ["mov", "var"]
-
 
 def deccccn(str_number):
     st = ''
@@ -65,7 +57,6 @@ def deccccn(str_number):
         st += str(remainder)
         str_number = int(str_number)//2
     return st[::-1]    
-
 
 def format_zero_adder(str1,size_req):
 	return (size_req-len(str1))*"0"+str1
@@ -199,33 +190,24 @@ def typeF(instruction):
     #halt
     print (op_dict[instruction] + '0'*11)
 
-
 def instruction_initialize(input,ixx):
-    
     if (input[0] in typeA_list):
         typeA(input[0],input[1],input[2],input[3])
-
     elif (input[0] in typeB_list):
         typeB(input[0],input[1],input[2],ixx)
-
     elif (input[0] in typeC_list):
         typeC(input[0],input[1],input[2])
-
     elif (input[0] in typeD_list):
         typeD(input[0],input[1],input[2])
-
     elif (input[0] in typeE_list):
         typeE(input[0],input[1])
-
     elif (input[0] in typeF_list):
         typeF(input[0])
-
     elif (input[0] == "mov"):
         if (input[2][0]=="$"):
             typeB("mov1",input[1],input[2],ixx)
         else:
             typeC("mov2",input[1],input[2])
-
     else:
         #for error handling
         pass
@@ -252,8 +234,8 @@ def identify_input(input,ixx):
         return
 
 def line_check(line_input_count):
-    if (line_input_count > 256):
-        print("Total instruction lines exceeded count of 255")
+    if (line_input_count > 128):
+        print("Total instruction lines exceeded count of 128")
         exit()
 
 def var_error(inp,var_count):
@@ -265,7 +247,7 @@ def var_error(inp,var_count):
         if (var_initial_count != var_count):
             while (inp[i][0] != 'var'):
                 i+=1
-            print(f"var defined at {i}th/st/rd instruction, not at beginning of the file")
+            print(f"Error : var defined at {i} instruction, not at beginning of the file")
             exit()
 
 def halt_error(inp):
@@ -275,13 +257,13 @@ def halt_error(inp):
         if (inp[i][-1] == 'hlt'):
             hlt_count += 1
     if (hlt_count == 0):
-        print("hlt instruction missing")
+        print("Error: hlt instruction missing")
         exit()
     if (hlt_count==1 and inp[len(inp)-1][-1] != 'hlt'):
-        print("hlt not being used as the last instruction")
+        print("Error: hlt not being used as the last instruction")
         exit()
     if (hlt_count>1):
-        print("More than one hlt")
+        print("Error: More than one hlt")
         exit()
 
 def lbl_error(label_list):
@@ -292,22 +274,29 @@ def lbl_error(label_list):
         print ("Error: Defining label with same name multiple times!")
         exit()
     
+def typo_error(instructions):
+    for i in instructions:
+        if instructions[i][0] not in type_total:
+            print(f'Error at instruction line {i+var_count_final }')    
+            print(f"Error: Instruction {instructions[i][0]} is not a valid instruction")
+            exit()
+
 def register_valid_check(instructions, var_list, label_list):
     
     for i in instructions:
         if instructions[i][0] in ['add', 'sub', 'mul', 'xor', 'or', 'and','addf','subf']:   
             if len(instructions[i]) != 4:
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final+1 }')          
                 print ("Error: Invalid instruction length")
                 exit()
             
             if (instructions[i][1] not in register_dict.keys()) or (instructions[i][2] not in register_dict.keys()) or (instructions[i][3] not in register_dict.keys()):
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final+1 }')          
                 print ("Error: Wrong register input")
                 exit()
                 
             if (instructions[i][1] == 'FLAGS') or (instructions[i][2] == 'FLAGS') or (instructions[i][3] == 'FLAGS'):
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final +1}')          
                 print ('Error: Invalid use of FLAGS register')
                 exit()
                 
@@ -315,20 +304,20 @@ def register_valid_check(instructions, var_list, label_list):
             #type B mov
             if instructions[i][2][0] == '$':
                 imm = int(instructions[i][2][1:])
-                if (imm > 255) or (imm < 0):
-                    print(f'Error at instruction line {i+var_count_final}')          
+                if (imm > 127) or (imm < 0):
+                    print(f'Error at instruction line {i+var_count_final+1 }')          
                     print("Error: Invalid immediate value")
                     exit()
                 if len(instructions[i]) != 3:
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final+1 }')          
                     print ("Error: Invalid instruction length")
                     exit()
                 if instructions[i][1] not in register_dict.keys():
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final +1}')          
                     print ("Error: Invalid register")
                     exit()
                 if instructions[i][1] == 'FLAGS':
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final +1}')          
                     print ("Error: Invalid use of FLAGS register")
                     exit()
                 
@@ -338,196 +327,190 @@ def register_valid_check(instructions, var_list, label_list):
                 temp_imm, dec_imm = (instructions[i][2][1:]).split(".")
                 imm = int(temp_imm)
                 if (imm > 252) or (imm < 0):
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final+1 }')          
                     print("Error: Invalid immediate value")
                     exit()
                 if len(instructions[i]) != 3:
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final+1 }')          
                     print ("Error: Invalid instruction length")
                     exit()
                 if instructions[i][1] not in register_dict.keys():
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final+1 }')          
                     print ("Error: Invalid register")
                     exit()
                 if instructions[i][1] == 'FLAGS':
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final+1 }')          
                     print ("Error: Invalid use of FLAGS register")
                     exit()
             #type C mov
             else:
                 if len(instructions[i]) != 3:
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final +1}')          
                     print ("Error: Invalid instruction length")
                     exit()
                 
                 if instructions[i][1] not in register_dict.keys() or instructions[i][2] not in register_dict.keys():
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final }')          
                     print("Error: Invalid register")
                     exit()
 
                 if instructions[i][2] == 'FLAGS':
-                    print(f'Error at instruction line {i+var_count_final}')          
+                    print(f'Error at instruction line {i+var_count_final +1}')          
                     print ("Error: Invalid use of FLAGS register")
                     exit()
                 
         elif instructions[i][0] == 'ld' or instructions[i][0] == 'st':
             #a mem_addr in load and store must be a variable   
             if len(instructions[i]) != 3:
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final +1}')          
                 print("Error: Invalid instruction length")
                 exit()
             
             if instructions[i][1] not in register_dict.keys():
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final+1 }')          
                 print ("Error: Invalid register used!!")
                 exit()
             if instructions[i][1] == 'FLAGS':
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final +1}')          
                 print ("Error: Invalid use of FLAGS register")                         
                 exit()
             
             if instructions[i][2] not in var_list:
-                print(f'Error at instruction line {i+var_count_final}')          
-                print ("Error: A memory address in load and store must be a variable")
+                print(f'Error at instruction line {i+var_count_final +1}')          
+                print ("Error: Undefined variable used!")
                 exit()    
     
         elif instructions[i][0] in ['div', 'not','cmp']:
             if len(instructions[i]) != 3:
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final +1}')          
                 print ("Error: Invalid Instruction length")
                 exit()
             
             if instructions[i][1] not in register_dict.keys() or instructions[i][2] not in register_dict.keys():
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final+1 }')          
                 print ("Error: Invalid register used")
                 exit()
                 
             if instructions[i][1] == 'FLAGS' or instructions[i][2] == 'FLAGS':
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final+1 }')          
                 print ("Invalid use of FLAGS register")
                 exit()
             
         elif instructions[i][0] == 'rs' or instructions[i][0] == 'ls':
             if len(instructions[i]) != 3:
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final +1}')          
                 print ("Error: Invalid Instruction length")        
                 exit()
             
             if instructions[i][1] not in register_dict.keys():
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final +1}')          
                 print("Error: Invalid register used")
                 exit()
             
             if instructions[i][1] == 'FLAGS':
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final+1 }')          
                 print("Error: Invalid use of FLAGS register")
                 exit()
             
             if instructions[i][2][0] != '$':
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final +1}')          
                 print ("Error: Invalid Syntax (no '$' used before immediate value!)")
                 exit()
             
             if instructions[i][2][0] == '$':                        
                 imm = int(instructions[i][2][1:])
-                if (imm > 255) or (imm < 0):
-                    print(f'Error at instruction line {i+var_count_final}')          
-                    print ("Error: Immediate value entered is greater than 8 bits!")
+                if (imm > 127) or (imm < 0):
+                    print(f'Error at instruction line {i+var_count_final +1}')          
+                    print ("Error: Illegal Immediate value entered")
                     exit()
         
         elif instructions[i][0] in ['jmp', 'jlt', 'jgt', 'je']:
             
             if len(instructions[i]) != 2:
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final +1}')          
                 print ("Error: Invalid Instruction length")
                 exit()
             
             if (instructions[i][1]+":") not in label_list:
-                print(f'Error at instruction line {i+var_count_final}')          
-                print ("Error: A mem address in jump instructions must be a label")
+                print(f'Error at instruction line {i+var_count_final +1}')          
+                print ("Error: Undefined label used!")
                 exit()
          
         elif instructions[i][0] == 'hlt':
             
             if len(instructions[i]) != 1:
-                print(f'Error at instruction line {i+var_count_final}')          
+                print(f'Error at instruction line {i+var_count_final +1}')          
                 print ("Error: Invalid instruction length (giving commans to hlt)")        
                 exit()
         
         else:
-            print(f'Error at instruction line {i+var_count_final}')          
+            print(f'Error at instruction line {i+var_count_final +1}')          
             print ("General Syntax error")
             exit()            
     return None                
-
-def main():
     
-    global input_count
-    global inp
-    inp = {} #dictionary which stores input
-    instructions = {} #dict to store input instructions
-    vars = {} #dict to store input vars
-    labels = {} #dict to store input labels
-    input_count = 0 #to keep track of input 
-    print_count = 0 #keep track of print count
-    lbl_count = 0 #keep track of number of labels
-    inst_count = 0 #keeps track of number of non-var instructions
-    var_list = [] #list containing all the input vars
-    global var_count
-    var_count = 0
-    label_list=[] #list containing all the labels
+global input_count
+global inp
+inp = {} #dictionary which stores input
+instructions = {} #dict to store input instructions
+vars = {} #dict to store input vars
+labels = {} #dict to store input labels
+input_count = 0 #to keep track of input 
+print_count = 0 #keep track of print count
+lbl_count = 0 #keep track of number of labels
+inst_count = 0 #keeps track of number of non-var instructions
+var_list = [] #list containing all the input vars
+global var_count
+var_count = 0
+label_list=[] #list containing all the labels
 
-    while True:
-        try:
-            l = input().split()
-            if l != []:
-                inp[input_count] = l
-                input_count += 1
-                if l[-1] == 'hlt':
-                    break
-
-        except EOFError:
-            break    
-   
-    line_check(input_count)
-    global var_count_final
+with open('/Users/nimitpanwar/Desktop/stuff/CS/VS-uni/SEM2/CO-Project-CustomASM/input.txt', 'r') as f:
+    inp_lines = f.readlines()
     
-    for i in inp:
-        if inp[i][0] == 'var':
-            vars[var_count] = inp[i]
-            if len(inp[i])>0:
-                var_list.append(inp[i][1])
-                var_count += 1
+for line in inp_lines:
+    l = line.strip().split()
+    if l != []:
+        inp[input_count] = l
+        input_count += 1
+  
+line_check(input_count)
+global var_count_final
+    
+# for i in range(len(inp)):
+#     instructions[inst_count] = inp[i]
+#     inst_count += 1
 
-        elif inp[i][0] in type_total:
-            instructions[inst_count] = inp[i]
-            inst_count += 1
+for i in inp:
+    if inp[i][0] == 'var':
+        vars[var_count] = inp[i]
+        if len(inp[i])>0:
+            var_list.append(inp[i][1])
+            var_count += 1
+
+    elif inp[i][0] in type_total:
+        instructions[inst_count] = inp[i]
+        inst_count += 1
         
-        elif inp[i][0][-1] == ':' and inp[i][0][-2] != ' ':
-            labels[lbl_count] = inp[i]
-            label_dict[inp[i][0][:-1]] = i - var_count
-            lbl_count += 1
-            label_list.append(inp[i][0])
+    elif inp[i][0][-1] == ':' and inp[i][0][-2] != ' ':
+        labels[lbl_count] = inp[i]
+        label_dict[inp[i][0][:-1]] = i - var_count
+        lbl_count += 1
+        label_list.append(inp[i][0])
 
+    elif inp[i] == []:
+        pass
+    else:
+        var_count_final = var_count
+        register_valid_check(instructions, var_list, label_list)
 
-        elif inp[i] == []:
-            pass
+var_count_final = var_count
 
-        else:
-            var_count_final = var_count
-            register_valid_check(instructions, var_list, label_list)
+typo_error(instructions)
+register_valid_check(instructions, var_list, label_list)
+halt_error(inp)
+var_error(inp, var_count)
+lbl_error(label_list)
 
-    var_count_final = var_count
-
-    register_valid_check(instructions, var_list, label_list)
-    var_error(inp, var_count)
-    halt_error(inp)
-    lbl_error(label_list)
-
-    for i in inp:
-        ixx = i
-        identify_input(inp[i],ixx)
-
-if __name__ =="__main__":
-    main()
-        
+for i in inp:
+    ixx = i
+    identify_input(inp[i],ixx)
