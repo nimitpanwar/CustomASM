@@ -38,7 +38,7 @@ def print_reg():
         print(decToBin(reg_Val_Dict.get(i),16),end=" ")
 
 # Instruction functions
-def add(current):
+def add(current,flags):
     dest_reg=getRegVal(current[7:10])
     reg1=getRegVal(current[10:13])
     reg2=getRegVal(current[13:16])
@@ -198,7 +198,7 @@ while(halted!=True):
     
     # Identifying opcode and executing instructions 
     if(curr_inst=="00000"):
-        newFlags=add(curr)    
+        newFlags=add(curr,flags)    
     elif(curr_inst=="00001"):
         newFlags=sub(curr,flags)
     elif(curr_inst=="00110"):
@@ -237,17 +237,18 @@ while(halted!=True):
         jump_inst=True
     elif(curr_inst=="11010"):
         halted=True
-        
-    print(bin_pc,end=" ")
-    print_reg()
-    print(flags)
-    print("") 
 
     # Setting/Resetting flags reg
     if(newFlags==flags):
         flags="0000000000000000"
     else:
         flags=newFlags
+
+    print(bin_pc,end=" ")
+    print_reg()
+    print(flags)
+    print("") 
+
     # If no jump is encountered increment pc by 1 
     if(jump_inst!=True):
         pc+=1
