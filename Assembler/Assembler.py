@@ -129,7 +129,7 @@ def typeA(instruction,r1,r2,r3):
     c3 = registers[r3.upper()]
 
     op = opcode[instruction]
-    output_list.append(op + '0'*2 + c1 + c2 + c3)
+    print(op + '0'*2 + c1 + c2 + c3)
 
 
 def typeB(instruction, reg, imm_val, temp):
@@ -141,7 +141,7 @@ def typeB(instruction, reg, imm_val, temp):
     if (op=='00010' or op=='01000' or op=='01001'):
         int_imm_val = int(imm_val)
         bin_imm_val = bitrep(int_imm_val)
-        output_list.append(op + '0' + c1  + unused_add(bin_imm_val,7))
+        print(op + '0' + c1  + unused_add(bin_imm_val,7))
         return
 
     else:
@@ -159,7 +159,7 @@ def typeC(instruction,r1,r2):
     c1 = registers[r1.upper()]
     c2 = registers[r2.upper()]
 
-    output_list.append(op  + '0' * 5 + c1  + c2)
+    print(op  + '0' * 5 + c1  + c2)
 
 
 def typeD(instruction, r1, variable_name):
@@ -168,18 +168,18 @@ def typeD(instruction, r1, variable_name):
     c1 = registers[r1.upper()]
     mem_addr = variable_dict[variable_name]
     
-    output_list.append(op + '0' + c1  + mem_addr)
+    print(op + '0' + c1  + mem_addr)
  
     
 def typeE(instruction, mem_addr):
 
     label_instruction_num = label_dict[mem_addr]
-    output_list.append(opcode[instruction] + '0'*4  + unused_add(bitrep(label_instruction_num),7))
+    print(opcode[instruction] + '0'*4  + unused_add(bitrep(label_instruction_num),7))
 
 
 def typeF(instruction):
 
-    output_list.append(opcode[instruction] + '0'*11)
+    print(opcode[instruction] + '0'*11)
 
 def instruction_init(input,temp):
     if (input[0] in typeA_list):
@@ -424,14 +424,18 @@ var_count = 0
 label_list=[] 
 output_list=[] 
 
-with open('input.txt', 'r') as f:
-    inp_lines = f.readlines()
-    
-for line in inp_lines:
-    l = line.strip().split()
-    if l != []:
-        inp[input_count] = l
-        input_count += 1
+while True:
+    try:
+        l = input().split()
+        if l != []:
+            inp[input_count] = l
+            input_count += 1
+            if l[-1] == 'hlt':
+                break
+
+    except EOFError:
+        break    
+
   
 line_check(input_count)
 global var_count_final
@@ -476,11 +480,3 @@ lbl_error(label_list)
 for i in inp:
     temp = i
     identify_input(inp[i],temp)
-
-with open("output.txt","w")as f: 
-    f.write("")
-
-with open("output.txt","a")as f:
-    for i in range(len(output_list)):
-        f.write(output_list[i])
-        f.write("\n")
