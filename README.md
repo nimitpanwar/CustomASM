@@ -1,4 +1,6 @@
-### CustomASM
+## CustomASM
+📌 ## NOTE FOR MID-PROJECT EVALUATION -
+#### Kindly refer to the 'CO_A_P1' folder for evaluation, it contains the assembler code synced with run file.
 
 ##### About
 
