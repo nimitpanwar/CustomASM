@@ -1,6 +1,6 @@
 reg_Val_Dict= {
     '000': 0,
-    '001': 32,
+    '001': 0,
     '010': 0,
     '011': 0,
     '100': 0,
@@ -250,6 +250,6 @@ while(halted!=True):
     print("") 
 
     # If no jump is encountered increment pc by 1 
-    if(jump_inst!=True):
+    if(jump_inst==False):
         pc+=1
     
