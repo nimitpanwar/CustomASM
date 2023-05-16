@@ -1,40 +1,3 @@
-register_dict = {
-    'R0': '000',
-    'R1': '001',
-    'R2': '010',
-    'R3': '011',
-    'R4': '100',
-    'R5': '101',
-    'R6': '110',
-    'FLAGS': '111',
-}
-
-op_dict = {
-    'addf' : '10000',
-    'subf' : '10001',
-    'movf' : '00010',
-    'add'  : '00000',
-    'sub'  : '00001',
-    'mov1' : '00010',
-    'mov2' : '00011',
-    'ld'   : '00100',
-    'st'   : '00101',
-    'mul'  : '00110',
-    'div'  : '00111',
-    'rs'   : '01000',
-    'ls'   : '01001',
-    'xor'  : '01010',
-    'or'   : '01011',
-    'and'  : '01100',
-    'not'  : '01101',
-    'cmp'  : '01110',
-    'jmp'  : '01111',
-    'jlt'  : '11100',
-    'jgt'  : '11101',
-    'je'   : '11111',
-    'hlt'  : '11010'
-}
-
 reg_Val_Dict= {
     '000': 0,
     '001': 32,
@@ -45,7 +8,7 @@ reg_Val_Dict= {
     '110': 0,
 }
 
-flag="0000000000000000"
+flags="0000000000000000"
 
 # Opening file
 with open("sample_sim.txt") as f:
@@ -83,9 +46,9 @@ def add(current):
     dest_reg=reg1+reg2
     if(len(bin(dest_reg))<=7):
         reg_Val_Dict[current[7:10]]=dest_reg
-        return flag
+        return flags
     else:
-        return flag[0:12]+"1"+flag[13:16]
+        return flags[0:12]+"1"+flags[13:16]
 
 
 def sub(current,flag):
@@ -108,9 +71,9 @@ def mul(current):
     dest_reg=reg1*reg2
     if(len(bin(dest_reg))<=7):
         reg_Val_Dict[current[7:10]]=dest_reg
-        return flag
+        return flags
     else:
-        return flag[0:12]+"1"+flag[13:16]
+        return flags[0:12]+"1"+flags[13:16]
 
 def XOR(current):
     dest_reg=getRegVal(current[7:10])
@@ -187,6 +150,37 @@ def inv(current):
     not_val=~reg2
     reg_Val_Dict[current[10:13]]=not_val
 
+def jmp(current):
+    pc=binToDec(current[9:16])
+    return pc
+
+def jlt(pc,current):
+    if flags[13]=="1":
+        pc=binToDec(current[9:16])
+    else:
+        pc+=1
+    return pc
+
+def jgt(pc,current):
+    if flags[14]=="1":
+        pc=binToDec(current[9:16])
+    else:
+        pc+=1
+    return pc
+
+def je(pc,current):
+    if flags[15]=="1":
+        pc=binToDec(current[9:16])
+    else:
+        pc=pc+1
+    return pc
+
+def ld(current):
+    pass
+
+def st(current):
+    pass 
+
 # Program variables
 pc=0
 output_list=[]
@@ -195,16 +189,20 @@ i=0
 
 # Main execution
 while(halted!=True):
+    # variables
     bin_pc=decToBin(pc,7)
-    curr=input_list[i]
+    curr=input_list[pc]
     curr_inst=(curr[0:5])
-
+    jump_inst=False
+    newFlags=flags
+    
+    # Identifying opcode and executing instructions 
     if(curr_inst=="00000"):
-        flag=add(curr)    
+        newFlags=add(curr)    
     elif(curr_inst=="00001"):
-        flag=sub(curr,flag)
+        newFlags=sub(curr,flags)
     elif(curr_inst=="00110"):
-        flag=mul(curr)
+        newFlags=mul(curr)
     elif(curr_inst=="01010"):
         XOR(curr)
     elif(curr_inst=="01011"):
@@ -220,17 +218,37 @@ while(halted!=True):
     elif(curr_inst=="00011"):
         mov_reg(curr)
     elif(curr_inst=="00111"):
-        flag=div(curr,flag)
+        newFlags=div(curr,flags)
     elif(curr_inst=="01101"):
         inv(curr)
     elif(curr_inst=="01110"):
-        flag=cmp(curr,flag)
+        newFlags=cmp(curr,flags)
+    elif(curr_inst=="01111"):
+        pc=jmp(curr)
+        jump_inst=True
+    elif(curr_inst=="11100"):
+        pc=jlt(pc,curr)
+        jump_inst=True
+    elif(curr_inst=="11101"):
+        pc=jgt(pc,curr)
+        jump_inst=True
+    elif(curr_inst=="11111"):
+        pc=je(pc,curr)
+        jump_inst=True
     elif(curr_inst=="11010"):
         halted=True
         
     print(bin_pc,end=" ")
     print_reg()
-    print(flag)
+    print(flags)
     print("") 
-    i+=1
-    pc+=1
+
+    # Setting/Resetting flags reg
+    if(newFlags==flags):
+        flags="0000000000000000"
+    else:
+        flags=newFlags
+    # If no jump is encountered increment pc by 1 
+    if(jump_inst!=True):
+        pc+=1
+    
