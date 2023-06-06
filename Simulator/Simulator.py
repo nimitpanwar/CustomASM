@@ -1,6 +1,6 @@
 reg_Val_Dict = {
     '000': 0,
-    '001': 0,
+    '001': 33,
     '010': 0,
     '011': 0,
     '100': 0,
@@ -239,10 +239,21 @@ def cmp(current, flag):
     return flag
 
 
+# def inv(current):
+#     reg2 = getRegVal(current[13:16])
+#     not_val = ~reg2
+#     reg_Val_Dict[current[10:13]] = not_val
+
 def inv(current):
-    reg2 = getRegVal(current[13:16])
-    not_val = ~reg2
-    reg_Val_Dict[current[10:13]] = not_val
+    reg2=getRegVal(current[13:16])
+    not_val=""
+    for i in decToBin(reg2,7):
+        if i=="0":
+            not_val="".join([not_val,"1"])
+        elif i=="1":
+            not_val="".join([not_val,"0"])
+    reg_Val_Dict[current[10:13]]=binToDec(not_val)
+    # print(not_val)
 
 
 def jmp(current):
