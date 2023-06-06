@@ -203,9 +203,14 @@ def l_shift(current):
 
 
 def mov_reg(current):
-    reg1 = getRegVal(current[13:16])
-    dest_reg = reg1
-    reg_Val_Dict[current[10:13]] = dest_reg
+    if(current[13:16]!="111"):
+        reg1=getRegVal(current[13:16])
+        dest_reg=reg1
+        reg_Val_Dict[current[10:13]]=dest_reg
+    else:
+        reg1=binToDec(flags)
+        dest_reg=reg1
+        reg_Val_Dict[current[10:13]]=dest_reg
 
 
 def div(current, flag):
@@ -349,10 +354,29 @@ while (halted != True):
     else:
         flags = newFlags
 
-    print(bin_pc, end=" ")
+    print(bin_pc, end="        ")
     print_reg()
     print(flags)
-    print("")
+    # print("")
 
     if (jump_inst == False):
         pc += 1
+
+
+n_nl=0
+for i in input_list:
+    if i=="\n":
+        n_nl+=1
+
+for i in range(n_nl):
+    input_list.remove("\n")
+
+for i in input_list:
+    if "\n" in i:
+        print(i,end="")
+    else:
+        print(i)
+
+while(pc<128):
+    print("0000000000000000")
+    pc += 1
