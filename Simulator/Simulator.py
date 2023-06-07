@@ -286,11 +286,18 @@ def je(pc, current):
 
 
 def ld(current):
-    pass
+    mem_add = current[9:16]
+    dest_reg = current[6:9]
+    if mem_add not in varDict.keys():
+        varDict[mem_add] = 0
+    reg_Val_Dict[dest_reg] = varDict[mem_add]
+    
 
 
 def st(current):
-    pass
+    mem_add = current[9:16]
+    dest_reg = current[6:9]
+    varDict[mem_add] = reg_Val_Dict[dest_reg]
 
 
 # Program variables
