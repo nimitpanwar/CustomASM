@@ -1,12 +1,14 @@
 reg_Val_Dict = {
     '000': 0,
-    '001': 0,
+    '001': 33,
     '010': 0,
     '011': 0,
     '100': 0,
     '101': 0,
     '110': 0,
 }
+
+varDict={}
 
 flags = "0000000000000000"
 
@@ -365,6 +367,15 @@ while (halted != True):
         newFlags = mulf(curr)
     elif (curr_inst == "10010"):
         movf_imm(curr)
+    elif (curr_inst == "10010"):
+        movf_imm(curr)
+    elif (curr_inst == "10010"):
+        movf_imm(curr)
+    elif (curr_inst == "00100"):
+        ld(curr)
+    elif (curr_inst == "00101"):
+        st(curr)
+
 
     # Setting/Resetting flags reg
     if (newFlags == flags):
